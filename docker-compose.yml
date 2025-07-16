@@ -1,0 +1,47 @@
+version: '3.7'
+name: 'drill-cloud-backend'
+
+services:
+  app:
+    image: cloud-backend
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - '3000:3000'
+    volumes:
+      - cloud-backend:/cloud-backend
+    networks:
+      - docker-network
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  postgres:
+    image: postgres:17
+    build:
+      context: .
+      dockerfile: Dockerfile.postgresql
+    environment:
+      POSTGRES_DB: drill-cloud
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: '12341234'
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U postgres']
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - docker-network
+
+volumes:
+  cloud-backend:
+  postgres-data:
+
+networks:
+  docker-network:
+    driver: bridge
