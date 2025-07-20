@@ -10,9 +10,18 @@ datasource db {
 model SensorData {
   id        Int      @id @default(autoincrement())
   edgeId    Int      @map("edge_id")
-  timestamp DateTime @default(now())
   tag       String
+  timestamp DateTime @default(now())
   value     Int
 
   @@map("sensor_data")
+}
+
+model Thresholds {
+  id  Int    @id @default(autoincrement())
+  tag String @unique
+  min Int?
+  max Int?
+
+  @@map("thresholds")
 }

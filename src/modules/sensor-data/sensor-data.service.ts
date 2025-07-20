@@ -1,6 +1,6 @@
 import envConfig from '@config/env.config';
-import { BadRequestException, Injectable } from '@nestjs/common';
-import { Prisma } from '@prisma/client';
+import { Injectable } from '@nestjs/common';
+import { Prisma, SensorData } from '@prisma/client';
 import { PrismaService } from 'nestjs-prisma';
 import { SensorDataGetDTO } from './dto';
 import { SensorDataAddDTO } from './dto/add.dto';
@@ -15,18 +15,24 @@ export class SensorDataService {
   }
 
   async create(dto: SensorDataAddDTO) {
-    return await this.prisma.sensorData
-      .create({
-        data: {
-          edgeId: dto.edgeId,
-          tag: dto.tag,
-          timestamp: dto.timestamp,
-          value: dto.value,
-        },
-      })
-      .catch(() => {
-        throw new BadRequestException('Ошибка добавления данных');
-      });
+    const returnData: SensorData[] = [];
+    for (const data of dto.data) {
+      const item = await this.prisma.sensorData
+        .create({
+          data: {
+            edgeId: data.edgeId,
+            tag: data.tag,
+            timestamp: data.timestamp,
+            value: data.value,
+          },
+        })
+        .catch(() => {
+          return null;
+        });
+      if (!item) continue;
+      returnData.push(item);
+    }
+    return returnData;
   }
 
   async get(options: SensorDataGetDTO) {

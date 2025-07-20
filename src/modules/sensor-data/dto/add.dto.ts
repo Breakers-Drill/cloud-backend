@@ -1,8 +1,8 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { IsDate, IsNumber, IsString } from 'class-validator';
+import { IsArray, IsDate, IsNumber, IsString, ValidateNested } from 'class-validator';
 
-export class SensorDataAddDTO {
+class SensorDataAddData {
   @ApiProperty({ type: 'number' })
   @IsNumber()
   edgeId: number;
@@ -19,4 +19,12 @@ export class SensorDataAddDTO {
   @ApiProperty({ type: 'number' })
   @IsNumber()
   value: number;
+}
+
+export class SensorDataAddDTO {
+  @IsArray()
+  @Type(() => SensorDataAddData)
+  @ValidateNested({ each: true })
+  @ApiProperty({ type: SensorDataAddData, isArray: true })
+  data: SensorDataAddData[];
 }

@@ -1,13 +1,1 @@
 FROM postgres:17
-
-# Установка pg_cron
-RUN apt-get update && \
-    apt-get install -y postgresql-contrib postgresql-17-cron
-
-# Настройка pg_cron
-RUN echo "shared_preload_libraries = 'pg_cron'" >> /usr/share/postgresql/postgresql.conf.sample && \
-    echo "cron.database_name = 'drill-cloud'" >> /usr/share/postgresql/postgresql.conf.sample
-
-# # Копирование инициализационного SQL-скрипта в контейнер
-# COPY init/db.sql /docker-entrypoint-initdb.d/init-db.sql
-    
