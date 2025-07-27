@@ -18,6 +18,6 @@ async function bootstrap() {
 
   setupSwagger(app);
 
-  await app.listen(envConfig.APP_PORT, "0.0.0.0");
+  await app.listen(envConfig.APP_PORT);
 }
 void bootstrap();
