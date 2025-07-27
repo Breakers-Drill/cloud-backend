@@ -16,6 +16,14 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.drill.rule=Host(`drill.pirates0lk.vps-server.ru`) && PathPrefix(`/cloud`)"
+      - "traefik.http.routers.drill.entrypoints=websecure"
+      - "traefik.http.routers.drill.tls.certresolver=letsencrypt"
+      - "traefik.http.services.drill.loadbalancer.server.port=3000"
+      - "traefik.http.routers.drill.middlewares=strip-cloud"
+      - "traefik.http.middlewares.strip-cloud.stripprefix.prefixes=/cloud"
 
   postgres:
     image: postgres:17
