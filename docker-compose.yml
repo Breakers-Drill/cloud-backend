@@ -4,14 +4,19 @@ name: 'drill-cloud-backend'
 services:
   mosquitto:
     image: eclipse-mosquitto:2.0
+    build:
+      context: .
+      dockerfile: Dockerfile.mosquitto
     ports:
       - '1883:1883'
       - '9001:9001'
     volumes:
-      - ./mosquitto/config:/mosquitto/config
-      - ./mosquitto/data:/mosquitto/data
-      - ./mosquitto/log:/mosquitto/log
+      - mosquitto:/mosquitto/config:/mosquitto/config
+      - mosquitto:/mosquitto/data:/mosquitto/data
+      - mosquitto:/mosquitto/log:/mosquitto/log
     restart: unless-stopped
+    networks:
+      - cloud-backend
   app:
     image: cloud-backend
     build:
@@ -22,7 +27,7 @@ services:
     volumes:
       - cloud-backend:/cloud-backend
     networks:
-      - docker-network
+      - cloud-backend
     depends_on:
       postgres:
         condition: service_healthy
@@ -46,12 +51,13 @@ services:
     volumes:
       - postgres-data:/var/lib/postgresql/data
     networks:
-      - docker-network
+      - cloud-backend
 
 volumes:
   cloud-backend:
   postgres-data:
+  mosquitto:
 
 networks:
-  docker-network:
+  cloud-backend:
     driver: bridge

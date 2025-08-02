@@ -47,7 +47,7 @@ export class SensorDataService {
     });
 
     if (interval) {
-      return this.utils.filterDataByInterval(data, '5min');
+      return this.utils.filterDataByInterval(data, interval);
     }
 
     return data;

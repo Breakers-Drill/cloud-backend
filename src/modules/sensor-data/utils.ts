@@ -1,6 +1,5 @@
 import { SensorData } from '@prisma/client';
-
-type Interval = '5min' | '10min' | '30min' | '1h' | '2h';
+import { EDateInterval } from '@shared/types/sensor-data.types';
 
 export default class SensorDataUtils {
   public filterByTimeInterval(data: SensorData[], intervalHours: number): SensorData[] {
@@ -23,7 +22,7 @@ export default class SensorDataUtils {
     return filteredData;
   }
 
-  public filterDataByInterval(data: SensorData[], interval: Interval): SensorData[] {
+  public filterDataByInterval(data: SensorData[], interval: EDateInterval): SensorData[] {
     if (data.length === 0) return [];
 
     const intervalMs = {

@@ -24,7 +24,7 @@ export class SensorDataGetDTO {
   @ValidateNested()
   dateInterval: DateInterval | undefined;
 
-  @ApiProperty({ type: 'string', example: 'hour', examples: ['hour', '2hour'], required: false })
+  @ApiProperty({ type: 'string', example: 'hour', examples: ['5min', 'h', '2h'], required: false })
   @IsOptional()
   @Transform(({ value }) => ('' + value).toLowerCase())
   @IsEnum(EDateInterval)
