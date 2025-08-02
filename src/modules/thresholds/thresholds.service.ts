@@ -21,4 +21,10 @@ export class ThresholdsService {
       throw new BadRequestException('Ошибка обновления!');
     });
   }
+
+  async delete(data: Prisma.ThresholdsWhereUniqueInput) {
+    return this.prisma.thresholds.delete({ where: data }).catch(() => {
+      return null;
+    });
+  }
 }

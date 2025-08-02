@@ -1,9 +1,8 @@
 import envConfig from '@config/env.config';
 import { Injectable } from '@nestjs/common';
-import { Prisma, SensorData } from '@prisma/client';
+import { Prisma } from '@prisma/client';
 import { PrismaService } from 'nestjs-prisma';
 import { SensorDataGetDTO } from './dto';
-import { SensorDataAddDTO } from './dto/add.dto';
 import SensorDataUtils from './utils';
 
 @Injectable()
@@ -14,48 +13,41 @@ export class SensorDataService {
     this.utils = new SensorDataUtils();
   }
 
-  async create(dto: SensorDataAddDTO) {
-    const returnData: SensorData[] = [];
-    for (const data of dto.data) {
-      const item = await this.prisma.sensorData
-        .create({
-          data: {
-            edgeId: data.edgeId,
-            tag: data.tag,
-            timestamp: data.timestamp,
-            value: data.value,
-          },
-        })
-        .catch(() => {
-          return null;
-        });
-      if (!item) continue;
-      returnData.push(item);
-    }
-    return returnData;
+  async createMany(data: Prisma.SensorDataCreateInput[]) {
+    return await this.prisma.sensorData.createMany({ data: data }).catch(() => {
+      return null;
+    });
+  }
+
+  async createOne(data: Prisma.SensorDataCreateInput) {
+    return await this.prisma.sensorData.create({ data: data }).catch(() => {
+      return null;
+    });
   }
 
   async get(options: SensorDataGetDTO) {
     const { dateInterval, tag, interval } = options;
 
-    const timestamp: Prisma.DateTimeFilter =
+    const timestamp: Prisma.DateTimeFilter | undefined =
       dateInterval == undefined
-        ? {}
+        ? undefined
         : {
             lte: dateInterval.end,
             gte: dateInterval.start,
           };
+
+    const take = interval ? undefined : envConfig.SENSOR_DATA_GET_LIMIT;
 
     const data = await this.prisma.sensorData.findMany({
       where: {
         tag: tag,
         timestamp: timestamp,
       },
-      take: envConfig.SENSOR_DATA_GET_LIMIT,
+      take,
     });
 
     if (interval) {
-      return this.utils.filterByTimeInterval(data, interval);
+      return this.utils.filterDataByInterval(data, '5min');
     }
 
     return data;

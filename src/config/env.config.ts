@@ -14,6 +14,9 @@ const configSchema = z.object({
 
   SENSOR_DATA_GET_LIMIT: z.coerce.number(),
   SENSOR_DATA_GET_DEFAULT_INTERVAL: z.coerce.number(),
+
+  MQTT_BROKER_URL: z.string(),
+  MQTT_CLIENT_ID: z.string(),
 });
 
 const configServer = configSchema.safeParse(process.env);

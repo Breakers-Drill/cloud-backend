@@ -1,8 +1,6 @@
-import { Body, Controller, Post, UseGuards } from '@nestjs/common';
-import { ApiBody, ApiSecurity } from '@nestjs/swagger';
-import { InfraAuthGuard } from '@shared/guards';
+import { Body, Controller, Post } from '@nestjs/common';
+import { ApiBody } from '@nestjs/swagger';
 import { SensorDataGetDTO } from './dto';
-import { SensorDataAddDTO } from './dto/add.dto';
 import { SensorDataService } from './sensor-data.service';
 
 @Controller('sensor-data')
@@ -15,11 +13,11 @@ export class SensorDataController {
     return this.sensorDataService.get(dto);
   }
 
-  @Post('/add')
-  @UseGuards(InfraAuthGuard)
-  @ApiBody({ type: SensorDataAddDTO })
-  @ApiSecurity('infra')
-  async addData(@Body() dto: SensorDataAddDTO) {
-    return this.sensorDataService.create(dto);
-  }
+  // @Post('/add')
+  // @ApiSecurity('infra')
+  // @UseGuards(InfraAuthGuard)
+  // @ApiBody({ type: SensorDataAddDTO })
+  // async addData(@Body() dto: SensorDataAddDTO) {
+  //   return this.sensorDataService.create(dto);
+  // }
 }

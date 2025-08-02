@@ -1,4 +1,6 @@
-import { T_TagsMapData } from '@shared/types/sensor-data.types';
+import { T_TagsMapData, T_TagsMapTypes } from '@shared/types/sensor-data.types';
+
+export const VALID_TYPES: T_TagsMapTypes[] = ['bool', 'об/мин', 'бар', '°C', 'л/с', 'мм/с', 'Н·м', 'град', 'л', '%'];
 
 export const TAGS_MAP = new Map<string, T_TagsMapData>([
   [

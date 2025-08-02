@@ -8,11 +8,14 @@ datasource db {
 }
 
 model SensorData {
-  id        Int      @id @default(autoincrement())
+  id        String   @id @default(uuid())
   edgeId    Int      @map("edge_id")
   tag       String
   timestamp DateTime @default(now())
   value     Int
+
+  tagData    TagsData? @relation(fields: [tagsDataId], references: [id])
+  tagsDataId Int?
 
   @@map("sensor_data")
 }
@@ -24,4 +27,16 @@ model Thresholds {
   max Int?
 
   @@map("thresholds")
+}
+
+model TagsData {
+  id         Int          @id @default(autoincrement())
+  tag        String       @unique
+  name       String       @unique
+  type       String
+  minValue   Int          @map("min_value")
+  maxValue   Int          @map("max_value")
+  sensorData SensorData[]
+
+  @@map("tags_data")
 }

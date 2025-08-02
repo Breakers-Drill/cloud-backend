@@ -1,11 +1,13 @@
 import { setupSwagger } from '@config/swagger.config';
 import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
+import { useContainer } from 'class-validator';
 import { AppModule } from './app.module';
 import envConfig from './config/env.config';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  useContainer(app.select(AppModule), { fallbackOnErrors: true });
   app.useGlobalPipes(new ValidationPipe());
 
   const corsOrigin = envConfig.APP_CORS_ORIGIN;
