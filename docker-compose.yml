@@ -29,10 +29,10 @@ services:
     networks:
       - coolify
     labels:
-      - traefik.enable: 'true'
-      - traefik.http.routers.cloud-backend.entryPoints: 'http'
-      - traefik.http.routers.cloud-backend.rule: 'Host(`drill.pirates0k.vps-server.ru/cloud`)'
-      - traefik.http.services.cloud-backend.loadbalancer.server.port: '3000'
+      - traefik.enable=true
+      - traefik.http.routers.cloud-backend.rule=Host(`drill.pirates0k.vps-server.ru/cloud`)
+      - traefik.http.routers.cloud-backend.entryPoints=http
+      - traefik.docker.network=coolify
     depends_on:
       postgres:
         condition: service_healthy
