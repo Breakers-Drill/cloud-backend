@@ -29,10 +29,11 @@ services:
     networks:
       - cloud-backend
     labels:
-      - traefik.enable=true
-      - traefik.http.routers.arc.rule=Host(`drill.pirates0k.vps-server.ru/cloud`)
+      - traefik.enable: 'true'
+      - traefik.http.routers.cloud-backend.rule: 'Host(`drill.pirates0k.vps-server.ru/cloud`)'
+      - traefik.http.routers.cloud-backend.entrypoints: 'web'
       - traefik.http.routers.arc.entryPoints=http
-      - traefik.docker.network=traefik
+      - traefik.http.services.cloud-backend.loadbalancer.server.port: '3000'
     depends_on:
       postgres:
         condition: service_healthy
