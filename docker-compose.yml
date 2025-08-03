@@ -2,21 +2,21 @@ version: '3.7'
 name: 'drill-cloud-backend'
 
 services:
-  mosquitto:
-    image: eclipse-mosquitto:2.0
-    build:
-      context: .
-      dockerfile: Dockerfile.mosquitto
-    ports:
-      - '1883:1883'
-      - '9001:9001'
-    volumes:
-      - mosquitto:/mosquitto/config:/mosquitto/config
-      - mosquitto:/mosquitto/data:/mosquitto/data
-      - mosquitto:/mosquitto/log:/mosquitto/log
-    restart: unless-stopped
-    networks:
-      - cloud-backend
+  # mosquitto:
+  #   image: eclipse-mosquitto:2.0
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile.mosquitto
+  #   ports:
+  #     - '1883:1883'
+  #     - '9001:9001'
+  #   volumes:
+  #     - mosquitto:/mosquitto/config:/mosquitto/config
+  #     - mosquitto:/mosquitto/data:/mosquitto/data
+  #     - mosquitto:/mosquitto/log:/mosquitto/log
+  #   restart: unless-stopped
+  #   networks:
+  #     - cloud-backend
   app:
     image: cloud-backend
     build:
@@ -28,6 +28,11 @@ services:
       - cloud-backend:/cloud-backend
     networks:
       - cloud-backend
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.arc.rule=Host(`drill.pirates0k.vps-server.ru/cloud`)
+      - traefik.http.routers.arc.entryPoints=http
+      - traefik.docker.network=traefik
     depends_on:
       postgres:
         condition: service_healthy
@@ -56,7 +61,6 @@ services:
 volumes:
   cloud-backend:
   postgres-data:
-  mosquitto:
 
 networks:
   cloud-backend:

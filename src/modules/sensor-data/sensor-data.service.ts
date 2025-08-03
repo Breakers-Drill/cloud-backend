@@ -36,12 +36,19 @@ export class SensorDataService {
             gte: dateInterval.start,
           };
 
-    const take = interval ? undefined : envConfig.SENSOR_DATA_GET_LIMIT;
+    let take: undefined | number = undefined;
+
+    if (!interval && !timestamp) {
+      take = envConfig.SENSOR_DATA_GET_LIMIT;
+    }
 
     const data = await this.prisma.sensorData.findMany({
       where: {
         tag: tag,
         timestamp: timestamp,
+      },
+      orderBy: {
+        timestamp: 'asc',
       },
       take,
     });

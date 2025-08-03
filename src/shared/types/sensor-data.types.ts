@@ -1,4 +1,5 @@
 export enum EDateInterval {
+  '1min' = 60 * 1000,
   '5min' = 5 * 60 * 1000,
   '10min' = 10 * 60 * 1000,
   '30min' = 30 * 60 * 1000,
