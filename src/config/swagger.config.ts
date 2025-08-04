@@ -15,7 +15,7 @@ export function setupSwagger(app: INestApplication) {
     .setVersion('1.0')
     .build();
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('docs', app, document, {
+  SwaggerModule.setup('/cloud/docs', app, document, {
     customSiteTitle: appName,
     swaggerOptions: {
       tagsSorter: 'alpha',

@@ -9,7 +9,6 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   useContainer(app.select(AppModule), { fallbackOnErrors: true });
   app.useGlobalPipes(new ValidationPipe());
-  app.setGlobalPrefix('/cloud');
 
   const corsOrigin = envConfig.APP_CORS_ORIGIN;
   app.enableCors({
@@ -21,6 +20,7 @@ async function bootstrap() {
 
   setupSwagger(app);
 
+  app.setGlobalPrefix('/cloud');
   await app.listen(envConfig.APP_PORT);
 }
 void bootstrap();
