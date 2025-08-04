@@ -17,7 +17,13 @@ export class MonitorService implements OnModuleInit {
     this.url = envConfig.MQTT_BROKER_URL;
     this.clientId = envConfig.MQTT_CLIENT_ID;
     this.client = mqtt.connect(this.url, {
+      username: 'eWEJhCiRGPziGQJR',
+      auth: 'zABo2Vpb67b3rmxEP3d8MeldHht1NAqW',
+      password: 'zABo2Vpb67b3rmxEP3d8MeldHht1NAqW',
       clientId: this.clientId,
+    });
+    this.client.on('reconnect', () => {
+      console.log(1);
     });
     this.client.on('connect', () => this.onConnect());
     this.client.subscribe('PLC/test');

@@ -27,12 +27,7 @@ services:
     volumes:
       - cloud-backend:/cloud-backend
     networks:
-      - coolify
-    labels:
-      - traefik.enable=true
-      - traefik.http.routers.cloud-backend.rule=Host(`drill.pirates0k.vps-server.ru/cloud`)
-      - traefik.http.routers.cloud-backend.entryPoints=http
-      - traefik.docker.network=coolify
+      - cloud-backend
     depends_on:
       postgres:
         condition: service_healthy
@@ -56,12 +51,12 @@ services:
     volumes:
       - postgres-data:/var/lib/postgresql/data
     networks:
-      - coolify
+      - cloud-backend
 
 volumes:
   cloud-backend:
   postgres-data:
 
 networks:
-  coolify:
+  cloud-backend:
     driver: bridge
