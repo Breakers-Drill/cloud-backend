@@ -1,7 +1,7 @@
 import { BadRequestException, Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, UseGuards } from '@nestjs/common';
 import { ApiBody, ApiOperation, ApiParam, ApiSecurity } from '@nestjs/swagger';
 import { InfraAuthGuard } from '@shared/guards';
-import { CreateManyTagDataDto, CreateTagDataDto, UpdateManyTagDataDto, UpdateTagDataDto } from './dto';
+import { CreateManyTagDataDto, CreateTagDataDto, DeleteManyTagDataDto, UpdateManyTagDataDto, UpdateTagDataDto } from './dto';
 import { TagsDataService } from './tags-data.service';
 
 @Controller('tags-data')
@@ -42,6 +42,17 @@ export class TagsDataController {
   async findOne(@Param('id', ParseIntPipe) id: number) {
     const data = await this.tagsDataService.findOne(id);
     if (!data) throw new BadRequestException('Запись не найдена');
+    return data;
+  }
+
+  @Delete('')
+  @ApiSecurity('infra')
+  @UseGuards(InfraAuthGuard)
+  @ApiOperation({ summary: 'Массовое удаление записей о тегах' })
+  @ApiBody({ type: DeleteManyTagDataDto })
+  async deleteMany(@Body() dto: DeleteManyTagDataDto) {
+    const data = await this.tagsDataService.deleteMany(dto);
+    if (!data) throw new BadRequestException('Ошибка массового удаления информации о тегах');
     return data;
   }
 

@@ -4,6 +4,7 @@ import { CreateTagDataDto } from './dto/create';
 import { UpdateTagDataDto } from './dto/update';
 import { UpdateManyTagDataDto } from './dto/update-many';
 import { CreateManyTagDataDto } from './dto/create-many';
+import { DeleteManyTagDataDto } from './dto/delete-many';
 
 @Injectable()
 export class TagsDataService {
@@ -55,6 +56,13 @@ export class TagsDataService {
 
   delete(id: number) {
     return this.prisma.tagsData.delete({ where: { id } }).catch(() => {
+      return null;
+    });
+  }
+
+  async deleteMany(dto: DeleteManyTagDataDto) {
+    const operations = dto.ids.map((id) => this.prisma.tagsData.delete({ where: { id } }));
+    return this.prisma.$transaction(operations).catch(() => {
       return null;
     });
   }
