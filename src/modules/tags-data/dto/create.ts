@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { VALID_TYPES } from '@shared/constants/sensor-data';
-import { IsNumber, IsString } from 'class-validator';
+import { IsNumber, IsOptional, IsString } from 'class-validator';
 
 export class CreateTagDataDto {
   @ApiProperty({
@@ -43,4 +43,22 @@ export class CreateTagDataDto {
   })
   @IsNumber()
   maxValue: number;
+
+  @ApiProperty({
+    example: 1,
+    description: 'Множитель значения тега',
+    required: false,
+  })
+  @IsNumber()
+  @IsOptional()
+  multiplier?: number;
+
+  @ApiProperty({
+    example: 'Комментарий к тегу',
+    description: 'Комментарий',
+    required: false,
+  })
+  @IsString()
+  @IsOptional()
+  comment?: string;
 }

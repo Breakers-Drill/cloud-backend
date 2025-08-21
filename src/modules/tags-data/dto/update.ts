@@ -26,5 +26,15 @@ export class UpdateTagDataDto {
   @IsNumber()
   @IsOptional()
   maxValue?: number;
+
+  @ApiProperty({ example: 1, required: false })
+  @IsNumber()
+  @IsOptional()
+  multiplier?: number;
+
+  @ApiProperty({ example: 'Комментарий', required: false })
+  @IsString()
+  @IsOptional()
+  comment?: string;
 }
 

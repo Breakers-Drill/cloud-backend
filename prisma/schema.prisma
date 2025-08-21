@@ -36,6 +36,8 @@ model TagsData {
   type       String
   minValue   Int          @map("min_value")
   maxValue   Int          @map("max_value")
+  multiplier Float        @default(1)
+  comment    String       @default("")
   sensorData SensorData[]
 
   @@map("tags_data")
