@@ -1,8 +1,9 @@
-import { BadRequestException, Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, UseGuards } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Res, UseGuards } from '@nestjs/common';
 import { ApiBody, ApiOperation, ApiParam, ApiSecurity } from '@nestjs/swagger';
 import { InfraAuthGuard } from '@shared/guards';
 import { CreateManyTagDataDto, CreateTagDataDto, DeleteManyTagDataDto, UpdateManyTagDataDto, UpdateTagDataDto } from './dto';
 import { TagsDataService } from './tags-data.service';
+import type { Response } from 'express';
 
 @Controller('tags-data')
 export class TagsDataController {
@@ -34,6 +35,15 @@ export class TagsDataController {
   @ApiOperation({ summary: 'Получить все записи о тегах' })
   findAll() {
     return this.tagsDataService.findAll();
+  }
+
+  @Get('export/excel')
+  @ApiOperation({ summary: 'Экспортировать все теги в Excel' })
+  async exportExcel(@Res() res: Response) {
+    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    res.setHeader('Content-Disposition', 'attachment; filename="tags-data.xlsx"');
+    const buffer = await this.tagsDataService.exportExcel();
+    res.send(buffer);
   }
 
   @Get(':id')
