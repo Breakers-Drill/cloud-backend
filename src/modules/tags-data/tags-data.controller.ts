@@ -1,7 +1,7 @@
 import { BadRequestException, Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, UseGuards } from '@nestjs/common';
 import { ApiBody, ApiOperation, ApiParam, ApiSecurity } from '@nestjs/swagger';
 import { InfraAuthGuard } from '@shared/guards';
-import { CreateTagDataDto, UpdateTagDataDto } from './dto';
+import { CreateTagDataDto, UpdateManyTagDataDto, UpdateTagDataDto } from './dto';
 import { TagsDataService } from './tags-data.service';
 
 @Controller('tags-data')
@@ -59,6 +59,17 @@ export class TagsDataController {
   async update(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateTagDataDto) {
     const data = await this.tagsDataService.update(id, dto);
     if (!data) throw new BadRequestException('Ошибка обновления информации о теге');
+    return data;
+  }
+
+  @Patch()
+  @ApiSecurity('infra')
+  @UseGuards(InfraAuthGuard)
+  @ApiOperation({ summary: 'Массовое обновление записей о тегах' })
+  @ApiBody({ type: UpdateManyTagDataDto })
+  async updateMany(@Body() dto: UpdateManyTagDataDto) {
+    const data = await this.tagsDataService.updateMany(dto);
+    if (!data) throw new BadRequestException('Ошибка массового обновления информации о тегах');
     return data;
   }
 }

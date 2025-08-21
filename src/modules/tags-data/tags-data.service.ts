@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'nestjs-prisma';
 import { CreateTagDataDto } from './dto/create';
 import { UpdateTagDataDto } from './dto/update';
+import { UpdateManyTagDataDto } from './dto/update-many';
 
 @Injectable()
 export class TagsDataService {
@@ -23,6 +24,21 @@ export class TagsDataService {
 
   update(id: number, data: UpdateTagDataDto) {
     return this.prisma.tagsData.update({ where: { id }, data }).catch(() => {
+      return null;
+    });
+  }
+
+  async updateMany(dto: UpdateManyTagDataDto) {
+    const operations = dto.items.map((item) =>
+      this.prisma.tagsData.update({ where: { id: item.id }, data: {
+        tag: item.tag,
+        name: item.name,
+        type: item.type,
+        minValue: item.minValue,
+        maxValue: item.maxValue,
+      }}),
+    );
+    return this.prisma.$transaction(operations).catch(() => {
       return null;
     });
   }
