@@ -105,6 +105,58 @@ export class TagsDataService {
     return buffer as unknown as Buffer;
   }
 
+  async importExcel(buffer: Buffer) {
+    const workbook = new Workbook();
+    await workbook.xlsx.load(buffer);
+    const worksheet = workbook.getWorksheet('TagsData') || workbook.worksheets[0];
+    if (!worksheet) return [];
+
+    const headerRow = worksheet.getRow(1);
+    const headerToIndex: Record<string, number> = {};
+    headerRow.eachCell((cell, colNumber) => {
+      const header = String(cell.value || '').trim().toLowerCase();
+      if (header) headerToIndex[header] = colNumber;
+    });
+
+    const getCellValue = (row: number, header: string) => {
+      const idx = headerToIndex[header];
+      if (!idx) return undefined;
+      const cell = worksheet.getRow(row).getCell(idx);
+      const v = cell.value as any;
+      if (v && typeof v === 'object' && 'result' in v) return (v as any).result;
+      return v;
+    };
+
+    const operations = [] as any[];
+    for (let r = 2; r <= worksheet.rowCount; r++) {
+      const tag = String(getCellValue(r, 'tag') ?? '').trim();
+      const name = String(getCellValue(r, 'name') ?? '').trim();
+      const type = String(getCellValue(r, 'type') ?? '').trim();
+      const minValueRaw = getCellValue(r, 'min');
+      const maxValueRaw = getCellValue(r, 'max');
+      const multiplierRaw = getCellValue(r, 'multiplier');
+      const commentRaw = getCellValue(r, 'comment');
+
+      if (!tag || !name || !type) continue;
+
+      const minValue = Number.isFinite(Number(minValueRaw)) ? Math.round(Number(minValueRaw)) : 0;
+      const maxValue = Number.isFinite(Number(maxValueRaw)) ? Math.round(Number(maxValueRaw)) : 0;
+      const multiplier = Number.isFinite(Number(multiplierRaw)) ? Number(multiplierRaw) : 1;
+      const comment = commentRaw != null ? String(commentRaw) : '';
+
+      operations.push(
+        this.prisma.tagsData.upsert({
+          where: { tag },
+          update: { name, type, minValue, maxValue, multiplier, comment },
+          create: { tag, name, type, minValue, maxValue, multiplier, comment },
+        })
+      );
+    }
+
+    if (operations.length === 0) return [];
+    return this.prisma.$transaction(operations);
+  }
+
   delete(id: number) {
     return this.prisma.tagsData.delete({ where: { id } }).catch(() => {
       return null;

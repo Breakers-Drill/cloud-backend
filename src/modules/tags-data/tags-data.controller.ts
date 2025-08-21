@@ -1,5 +1,6 @@
-import { BadRequestException, Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Res, UseGuards } from '@nestjs/common';
-import { ApiBody, ApiOperation, ApiParam, ApiSecurity } from '@nestjs/swagger';
+import { BadRequestException, Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Res, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
+import { ApiBody, ApiConsumes, ApiOperation, ApiParam, ApiSecurity } from '@nestjs/swagger';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { InfraAuthGuard } from '@shared/guards';
 import { CreateManyTagDataDto, CreateTagDataDto, DeleteManyTagDataDto, UpdateManyTagDataDto, UpdateTagDataDto } from './dto';
 import { TagsDataService } from './tags-data.service';
@@ -44,6 +45,28 @@ export class TagsDataController {
     res.setHeader('Content-Disposition', 'attachment; filename="tags-data.xlsx"');
     const buffer = await this.tagsDataService.exportExcel();
     res.send(buffer);
+  }
+
+  @Post('import/excel')
+  @ApiSecurity('infra')
+  @UseGuards(InfraAuthGuard)
+  @UseInterceptors(FileInterceptor('file'))
+  @ApiOperation({ summary: 'Импортировать теги из Excel (как экспорт, но без ID)' })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        file: {
+          type: 'string',
+          format: 'binary',
+        },
+      },
+    },
+  })
+  async importExcel(@UploadedFile() file: any) {
+    if (!file || !file.buffer) throw new BadRequestException('Файл не найден');
+    return this.tagsDataService.importExcel(file.buffer);
   }
 
   @Get(':id')
