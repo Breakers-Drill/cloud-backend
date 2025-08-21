@@ -69,6 +69,28 @@ export class TagsDataController {
     return this.tagsDataService.importExcel(file.buffer);
   }
 
+  @Post('import/csv')
+  @ApiSecurity('infra')
+  @UseGuards(InfraAuthGuard)
+  @UseInterceptors(FileInterceptor('file'))
+  @ApiOperation({ summary: 'Импортировать теги из CSV' })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        file: {
+          type: 'string',
+          format: 'binary',
+        },
+      },
+    },
+  })
+  async importCsv(@UploadedFile() file: any) {
+    if (!file || !file.buffer) throw new BadRequestException('Файл не найден');
+    return this.tagsDataService.importCsv(file.buffer);
+  }
+
   @Get(':id')
   @ApiOperation({ summary: 'Получить запись о теге по ID' })
   @ApiParam({ name: 'id', type: Number, description: 'ID записи', example: 1 })

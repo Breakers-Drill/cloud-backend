@@ -7,6 +7,46 @@ import { CreateManyTagDataDto } from './dto/create-many';
 import { DeleteManyTagDataDto } from './dto/delete-many';
 import { Workbook } from 'exceljs';
 
+function detectDelimiter(sample: string): string {
+  const candidates = [',', ';', '\t'];
+  let best = ',';
+  let bestCount = -1;
+  for (const d of candidates) {
+    const count = (sample.match(new RegExp(`\\${d}`, 'g')) || []).length;
+    if (count > bestCount) {
+      best = d;
+      bestCount = count;
+    }
+  }
+  return best;
+}
+
+function splitCsvLine(line: string, delimiter: string): string[] {
+  const result: string[] = [];
+  let current = '';
+  let inQuotes = false;
+  for (let i = 0; i < line.length; i++) {
+    const char = line[i];
+    if (char === '"') {
+      if (inQuotes && line[i + 1] === '"') {
+        current += '"';
+        i++; // skip escaped quote
+      } else {
+        inQuotes = !inQuotes;
+      }
+      continue;
+    }
+    if (!inQuotes && char === delimiter) {
+      result.push(current);
+      current = '';
+      continue;
+    }
+    current += char;
+  }
+  result.push(current);
+  return result.map((v) => v.trim());
+}
+
 @Injectable()
 export class TagsDataService {
   constructor(private readonly prisma: PrismaService) {}
@@ -138,6 +178,56 @@ export class TagsDataService {
       const commentRaw = getCellValue(r, 'comment');
 
       if (!tag || !name || !type) continue;
+
+      const minValue = Number.isFinite(Number(minValueRaw)) ? Math.round(Number(minValueRaw)) : 0;
+      const maxValue = Number.isFinite(Number(maxValueRaw)) ? Math.round(Number(maxValueRaw)) : 0;
+      const multiplier = Number.isFinite(Number(multiplierRaw)) ? Number(multiplierRaw) : 1;
+      const comment = commentRaw != null ? String(commentRaw) : '';
+
+      operations.push(
+        this.prisma.tagsData.upsert({
+          where: { tag },
+          update: { name, type, minValue, maxValue, multiplier, comment },
+          create: { tag, name, type, minValue, maxValue, multiplier, comment },
+        })
+      );
+    }
+
+    if (operations.length === 0) return [];
+    return this.prisma.$transaction(operations);
+  }
+
+  async importCsv(buffer: Buffer) {
+    const content = buffer.toString('utf8');
+    const lines = content.split(/\r?\n/).filter((l) => l.trim().length > 0);
+    if (lines.length === 0) return [];
+    const delimiter = detectDelimiter(lines[0]);
+    const headers = splitCsvLine(lines[0], delimiter).map((h) => h.trim());
+    const normalizeHeader = (h: string) => h.trim().toLowerCase();
+
+    const headerIndexes: Record<string, number> = {};
+    headers.forEach((h, idx) => {
+      headerIndexes[normalizeHeader(h)] = idx;
+    });
+
+    const getField = (fields: string[], name: string) => {
+      const idx = headerIndexes[normalizeHeader(name)];
+      if (idx === undefined) return undefined;
+      return fields[idx];
+    };
+
+    const operations = [] as any[];
+    for (let i = 1; i < lines.length; i++) {
+      const fields = splitCsvLine(lines[i], delimiter);
+      const tag = String(getField(fields, 'tag') ?? '').trim();
+      const name = String(getField(fields, 'name') ?? '').trim();
+      const type = String(getField(fields, 'type') ?? '').trim();
+      if (!tag || !name || !type) continue;
+
+      const minValueRaw = getField(fields, 'min') ?? getField(fields, 'minvalue');
+      const maxValueRaw = getField(fields, 'max') ?? getField(fields, 'maxvalue');
+      const multiplierRaw = getField(fields, 'multiplier');
+      const commentRaw = getField(fields, 'comment');
 
       const minValue = Number.isFinite(Number(minValueRaw)) ? Math.round(Number(minValueRaw)) : 0;
       const maxValue = Number.isFinite(Number(maxValueRaw)) ? Math.round(Number(maxValueRaw)) : 0;
