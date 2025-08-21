@@ -18,9 +18,8 @@ async function bootstrap() {
     exposedHeaders: ['Authorization'],
   });
 
-  setupSwagger(app);
-
   app.setGlobalPrefix('/cloud');
+  setupSwagger(app);
   await app.listen(envConfig.APP_PORT);
 }
 void bootstrap();
