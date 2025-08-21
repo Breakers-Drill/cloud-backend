@@ -1,7 +1,7 @@
 import { BadRequestException, Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, UseGuards } from '@nestjs/common';
 import { ApiBody, ApiOperation, ApiParam, ApiSecurity } from '@nestjs/swagger';
 import { InfraAuthGuard } from '@shared/guards';
-import { CreateTagDataDto, UpdateManyTagDataDto, UpdateTagDataDto } from './dto';
+import { CreateManyTagDataDto, CreateTagDataDto, UpdateManyTagDataDto, UpdateTagDataDto } from './dto';
 import { TagsDataService } from './tags-data.service';
 
 @Controller('tags-data')
@@ -16,6 +16,17 @@ export class TagsDataController {
   async create(@Body() dto: CreateTagDataDto) {
     const data = await this.tagsDataService.create(dto);
     if (!data) throw new BadRequestException('Ошибка создания информации о теге');
+    return data;
+  }
+
+  @Post('many')
+  @ApiSecurity('infra')
+  @UseGuards(InfraAuthGuard)
+  @ApiOperation({ summary: 'Создать несколько записей о тегах' })
+  @ApiBody({ type: CreateManyTagDataDto, description: 'Список данных для создания записей о тегах' })
+  async createMany(@Body() dto: CreateManyTagDataDto) {
+    const data = await this.tagsDataService.createMany(dto);
+    if (!data) throw new BadRequestException('Ошибка массового создания информации о тегах');
     return data;
   }
 
