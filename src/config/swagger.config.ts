@@ -14,7 +14,7 @@ export function setupSwagger(app: INestApplication) {
     .setTitle(appName)
     .setVersion('1.0')
     .build();
-  const document = SwaggerModule.createDocument(app, config);
+  const document = SwaggerModule.createDocument(app, config, { ignoreGlobalPrefix: false });
   SwaggerModule.setup('/cloud/docs', app, document, {
     customSiteTitle: appName,
     swaggerOptions: {
