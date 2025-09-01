@@ -32,7 +32,7 @@ model Thresholds {
 model TagsData {
   id         Int          @id @default(autoincrement())
   tag        String       @unique
-  name       String       @unique
+  name       String
   type       String
   minValue   Int          @map("min_value")
   maxValue   Int          @map("max_value")
