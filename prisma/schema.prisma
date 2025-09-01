@@ -42,3 +42,47 @@ model TagsData {
 
   @@map("tags_data")
 }
+
+model Edge {
+  key          String  @id @db.VarChar(255)
+  name         String? @db.VarChar(255)
+  attributes   EdgeAttribute[]
+  blocks       EdgeBlock[]
+}
+
+model EdgeAttribute {
+  id                    Int     @id @default(autoincrement())
+  edge_key              String  @db.VarChar(255)
+  bypass_state          String? @db.VarChar(255)
+  drive_state           String? @db.VarChar(255)
+  daily_maintenance     Boolean?
+  weekly_maintenance    Boolean?
+  monthly_maintenance   Boolean?
+  semiannual_maintenance Boolean?
+  annual_maintenance    Boolean?
+  
+  edge                  Edge @relation(fields: [edge_key], references: [key])
+
+  @@index([edge_key])
+  @@map("edge_attributes")
+}
+
+model EdgeBlock {
+  edge_key    String  @db.VarChar(255)
+  block_name  String  @db.VarChar(255)
+  description String? @db.Text
+  tags        BlockTag[]
+
+  edge        Edge    @relation(fields: [edge_key], references: [key])
+
+  @@id([edge_key, block_name])
+  @@map("edges_blocks")
+}
+
+model BlockTag {
+  tag         String  @id @db.VarChar(255)
+  description String? @db.Text
+  edge_key    String  @db.VarChar(255)
+  block_name  String  @db.VarChar(255)
+  block       EdgeBlock @relation(fields: [edge_key, block_name], references: [edge_key, block_name])
+}
