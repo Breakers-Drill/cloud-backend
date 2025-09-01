@@ -1,4 +1,4 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Get, Query } from '@nestjs/common';
 import { ApiBody } from '@nestjs/swagger';
 import { BlockTagsGetDTO } from '../dto/block-tags-get.dto';
 import { BlockTagService } from '../service/block-tag.service';
@@ -7,9 +7,9 @@ import { BlockTagService } from '../service/block-tag.service';
 export class BlockTagController {
   constructor(private readonly blockTagService: BlockTagService) {}
 
-  @Post('/')
+  @Get('/')
   @ApiBody({ type: BlockTagsGetDTO })
-  async getTags(@Body() dto: BlockTagsGetDTO) {
+  async getTags(@Query() dto: BlockTagsGetDTO = {}) {
     return this.blockTagService.get(dto);
   }
 }

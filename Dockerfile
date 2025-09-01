@@ -23,4 +23,4 @@ EXPOSE 3000
 RUN chmod +x ./scripts/start.sh
 
 # Запуск приложения при запуске контейнера
-CMD ["sh", "/usr/src/cloud-backend/scripts/start.sh"]
+CMD ["npm", "run", "start:prod"]

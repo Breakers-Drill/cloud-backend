@@ -1,4 +1,4 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Get, Query } from '@nestjs/common';
 import { ApiBody } from '@nestjs/swagger';
 import { EdgeBlocksGetDTO } from '../dto/edges-blocks-get.dto';
 import { EdgeBlockService } from '../service/edge-block.service';
@@ -7,9 +7,9 @@ import { EdgeBlockService } from '../service/edge-block.service';
 export class EdgeBlockController {
   constructor(private readonly edgeBlockService: EdgeBlockService) {}
 
-  @Post('/')
+  @Get('/')
   @ApiBody({ type: EdgeBlocksGetDTO })
-  async getBlocks(@Body() dto: EdgeBlocksGetDTO) {
+  async getBlocks(@Query() dto: EdgeBlocksGetDTO = {}) {
     return this.edgeBlockService.get(dto);
   }
 }

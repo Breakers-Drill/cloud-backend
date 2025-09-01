@@ -31,6 +31,8 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+    environment:
+    - DATABASE_URL=postgresql://postgres:12341234@postgres:5432/drill-cloud
 
   postgres:
     image: postgres:17

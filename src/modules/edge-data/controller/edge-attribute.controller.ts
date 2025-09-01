@@ -1,4 +1,4 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Get, Query } from '@nestjs/common';
 import { ApiBody } from '@nestjs/swagger';
 import { EdgeAttributesGetDTO } from '../dto/edges-attributes-get.dto';
 import { EdgeAttributeService } from '../service/edge-attribute.service';
@@ -7,9 +7,9 @@ import { EdgeAttributeService } from '../service/edge-attribute.service';
 export class EdgeAttributeController {
   constructor(private readonly edgeAttributeService: EdgeAttributeService) {}
 
-  @Post('/')
+  @Get('/')
   @ApiBody({ type: EdgeAttributesGetDTO })
-  async getAttributes(@Body() dto: EdgeAttributesGetDTO) {
+  async getAttributes(@Query() dto: EdgeAttributesGetDTO = {}) {
     return this.edgeAttributeService.get(dto);
   }
 }
