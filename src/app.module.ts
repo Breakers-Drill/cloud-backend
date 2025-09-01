@@ -7,6 +7,10 @@ import { SensorDataModule } from './modules/sensor-data/sensor-data.module';
 import { TagsDataModule } from './modules/tags-data/tags-data.module';
 import { ThresholdsModule } from './modules/thresholds/thresholds.module';
 import { MonitorModule } from './modules/monitor/monitor.module';
+import { EdgeModule } from './modules/edge-data/module/edge.module';
+import { EdgeAttributeModule } from './modules/edge-data/module/edge-attribute.module';
+import { EdgeBlockModule } from './modules/edge-data/module/edge-block.module';
+import { BlockTagModule } from './modules/edge-data/module/block-tag.module';
 
 @Module({
   imports: [
@@ -18,6 +22,10 @@ import { MonitorModule } from './modules/monitor/monitor.module';
     ThresholdsModule,
     TagsDataModule,
     MonitorModule,
+    EdgeModule,
+    EdgeAttributeModule,
+    EdgeBlockModule,
+    BlockTagModule
   ],
   controllers: [],
   providers: [IsValidTagValueConstraint, IsValidTagConstraint],
